@@ -61,25 +61,28 @@ void setup() {
   M5.Lcd.setTextSize(1);
   M5.Lcd.setTextColor(TFT_WHITE, TFT_BLACK);
   M5.Lcd.setTextDatum(TL_DATUM);
+  tm1637.displayStr( "NICT-TIME" );
   if(ntp() == false) while(1); //時刻取得に失敗した場合は、動作停止
 }
 void loop() {
   delay(1000); // Update the display every second
   getLocalTime(&timeinfo);
   if((timeinfo.tm_hour == 2)&&(timeinfo.tm_min == 0)&&(timeinfo.tm_sec == 0)) ntp(); //毎日午前2時に時刻取得。時刻取得に失敗しても動作継続
-  if(secLastReport != timeinfo.tm_sec) { //秒が更新されたら、表示をupdate
+// ループ関数の中で
+  if (secLastReport != timeinfo.tm_sec) { // 秒が変わったときだけ表示を更新
     secLastReport = timeinfo.tm_sec;
     M5.Lcd.setCursor(0, 0);
     M5.Lcd.printf("%02d/%02d/%02d(%s) %02d:%02d:%02d",
-    disp[0] = tm1637.encodeDigit(Hour / 10);
-    disp[1] = display.encodeDigit(Hour % 10) | 0b10000000;
-    disp[2] = display.encodeDigit(Min / 10);
-    disp[3] = display.encodeDigit(Min % 10);
-    display.setSegments(disp);
-      timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, week[timeinfo.tm_wday],
-      timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
-      tm1637.display(disp);
-  }
+        timeinfo.tm_year + 1900, timeinfo.tm_mon + 1, timeinfo.tm_mday, week[timeinfo.tm_wday],
+        timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec);
+        
+   // disp[0] = tm1637.encodeDigit(timeinfo.tm_hour / 10);
+   // disp[1] = tm1637.encodeDigit(timeinfo.tm_hour % 10) | 0b10000000; // ドットを2桁目に表示
+   // disp[2] = tm1637.encodeDigit(timeinfo.tm_min / 10);
+   // disp[3] = tm1637.encodeDigit(timeinfo.tm_min % 10);
+    
+    tm1637.display(disp);
+}
 
   delay(100); //0.1秒ウェイト
 }
